@@ -1,11 +1,20 @@
 [package]
 name = "prefpoll"
 version = "0.1.0"
+authors = ["Ethan Yi <ethyi@proton.me>"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib] # logic lives in the library crate, binary is entry to main function
 
+path = "src/lib.rs" # path to library
+
+# production dependencies
 [dependencies]
-actix-web = "4"
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+actix-web = "4" # main backend framework
+# async runtime
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] } 
 
+# dependencies for tests, not included at final release
+[dev_dependencies]
+reqwest = "0.11"
