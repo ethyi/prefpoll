@@ -14,6 +14,28 @@ path = "src/lib.rs" # path to library
 actix-web = "4" # main backend framework
 # async runtime
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] } 
+# serialization
+serde = { version = "1", features = ["derive"]}
+# for initial database configuration values
+config = "0.11"
+# for generating uuid
+uuid = { version = "0.8.1", features = ["v4"] }
+# for getting time
+chrono = "0.4.15"
+
+
+[dependencies.sqlx] #sqlx dependencies
+version = "0.5.7"
+default-features = false
+features = [
+	# use actix runtime for futures, rustls for transport level security
+	"runtime-actix-rustls", 
+	"macros", # query! macro
+	"postgres", # postgres specific, non-standard SQL types
+	"uuid", # mapping sql uuid to Uuid type
+	"chrono", # mapping sql timestamptz to DateTime<T>
+	"migrate" # sqlx-cli functionality, needed for testing
+]
 
 # dependencies for tests, not included at final release
 [dev_dependencies]
