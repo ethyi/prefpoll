@@ -5,6 +5,7 @@ use crate::routes::{create_poll, health_check};
 use actix_web::dev::Server; // import Server type
 use actix_web::{web, App, HttpServer};
 use sqlx::PgPool;
+use tracing_actix_web::TracingLogger;
 
 // pub to call by main, returns Err if fail to bind
 pub fn run(listener: TcpListener, pool: PgPool) -> Result<Server, std::io::Error> {
@@ -15,6 +16,8 @@ pub fn run(listener: TcpListener, pool: PgPool) -> Result<Server, std::io::Error
         // app is where the application logic and route handlers live
         // each worker has their own copy of App with its own PgConnection
         App::new()
+            // attach logger to app
+            .wrap(TracingLogger::default())
             // attach health check handler
             .route("/health_check", web::get().to(health_check))
             .route("/create_poll", web::post().to(create_poll))

@@ -3,25 +3,25 @@ use std::net::TcpListener;
 use prefpoll::{
     configuration::{get_configuration, DatabaseSettings},
     startup::run,
+    telemetry::init_subscriber,
 };
+use secrecy::ExposeSecret;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
+
+// allow one call to init_subscriber
+use once_cell::sync::Lazy;
+
 // spins up new runtime for every test, resources always cleaned up
 #[tokio::test]
-/// Test checks if
-/// check exposed at /health_check
-/// check behind GET method
-/// check returns 200
-/// check has no body
 async fn health_check_works() {
     // run server, get address used
     let app = spawn_app().await;
-    let address = app.address;
     // create a client using reqwest
     let client = reqwest::Client::new();
     // execute request to get response
     let response = client
-        .get(format!("{address}/health_check"))
+        .get(format!("{}/health_check", &app.address))
         .send()
         .await
         .expect("Failed to execute request.");
@@ -35,19 +35,12 @@ async fn health_check_works() {
 async fn create_poll_returns_a_200_for_valid_form_data() {
     // Arrange
     let app = spawn_app().await;
-    let address = app.address;
-    let configuration = get_configuration().expect("Failed to read config");
-    let connection_string = configuration.database.connection_string();
-    let mut connection = PgConnection::connect(&connection_string)
-        .await
-        .expect("Failed to connect to postgres.");
-
     let client = reqwest::Client::new();
 
     // Test correct post request
     let body = "question=Example%20Title&options=[o1,o2]";
     let response = client
-        .post(&format!("{}/create_poll", &address))
+        .post(&format!("{}/create_poll", &app.address))
         .header("Content-Type", "application/x-www-form-urlencoded")
         .body(body)
         .send()
@@ -56,7 +49,7 @@ async fn create_poll_returns_a_200_for_valid_form_data() {
     assert_eq!(200, response.status().as_u16());
     // Test postgres update
     let saved = sqlx::query!("SELECT question, options FROM poll")
-        .fetch_one(&mut connection)
+        .fetch_one(&app.db_pool)
         .await
         .expect("Failed to fetch saved poll");
     assert_eq!(saved.question, "Example Title");
@@ -67,7 +60,6 @@ async fn create_poll_returns_a_200_for_valid_form_data() {
 async fn create_poll_returns_a_400_when_data_is_missing() {
     // Arrange
     let app = spawn_app().await;
-    let address = app.address;
     let client = reqwest::Client::new();
     let test_cases = vec![
         ("question=Example%20Title", "missing the options"),
@@ -78,7 +70,7 @@ async fn create_poll_returns_a_400_when_data_is_missing() {
     for (invalid_body, error_message) in test_cases {
         // Act
         let response = client
-            .post(&format!("{}/create_poll", &address))
+            .post(&format!("{}/create_poll", &app.address))
             .header("Content-Type", "application/x-www-form-urlencoded")
             .body(invalid_body)
             .send()
@@ -96,17 +88,34 @@ async fn create_poll_returns_a_400_when_data_is_missing() {
     }
 }
 
+// init_subscriber, invoked once through the entirety of cargo test
+static TRACING: Lazy<()> = Lazy::new(|| {
+    let default_filter_level = "info".to_string();
+    let subscriber_name = "test".to_string();
+    // specify if you want logs TEST_LOG=true cargo test
+    if std::env::var("TEST_LOG").is_ok() {
+        init_subscriber(subscriber_name, default_filter_level, std::io::stdout);
+    } else {
+        init_subscriber(subscriber_name, default_filter_level, std::io::sink);
+    };
+});
+
 pub struct TestApp {
     pub address: String, // app_address
     pub db_pool: PgPool,
 }
 
 // launch app in background, return address used, generates a random database to test on
+
 async fn spawn_app() -> TestApp {
+    // only invoke init_subscriber once, subsequent calls skipped
+    Lazy::force(&TRACING);
+
     // get configuration, panic if no config
     let mut configuration = get_configuration().expect("Failed to read configuration.");
     // override database name to be a random name
     configuration.database.database_name = Uuid::new_v4().to_string();
+    // establish database connection
     let pool = configure_database(&configuration.database).await;
 
     let address = "127.0.0.1:0"; // port 0 finds port not in use
@@ -128,9 +137,10 @@ async fn spawn_app() -> TestApp {
 // Creates a testing database separate from the primary
 async fn configure_database(config: &DatabaseSettings) -> PgPool {
     // connect to postgres instance
-    let mut connection = PgConnection::connect(&config.connection_string_without_db())
-        .await
-        .expect("Failed to connect to Postgres");
+    let mut connection =
+        PgConnection::connect(&config.connection_string_without_db().expose_secret())
+            .await
+            .expect("Failed to connect to Postgres");
 
     // create database
     connection
@@ -139,7 +149,7 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .expect("Failed to create database.");
 
     // Migrate database
-    let connection_pool = PgPool::connect(&config.connection_string())
+    let connection_pool = PgPool::connect(&config.connection_string().expose_secret())
         .await
         .expect("Failed to connect to Postgres.");
 

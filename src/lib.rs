@@ -4,3 +4,6 @@ pub mod configuration;
 pub mod routes;
 // server startup
 pub mod startup;
+
+// logging setup
+pub mod telemetry;
