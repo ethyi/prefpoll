@@ -29,19 +29,19 @@ services:
     envs:
       - key: APP_DATABASE__USERNAME
         scope: RUN_TIME
-        value: ${prefpoll.USERNAME}
+        value: ${prefpolldb.USERNAME}
       - key: APP_DATABASE__PASSWORD
         scope: RUN_TIME
-        value: ${prefpoll.PASSWORD}
+        value: ${prefpolldb.PASSWORD}
       - key: APP_DATABASE__HOST
         scope: RUN_TIME
-        value: ${prefpoll.HOSTNAME}
+        value: ${prefpolldb.HOSTNAME}
       - key: APP_DATABASE__PORT
         scope: RUN_TIME
-        value: ${prefpoll.PORT}
+        value: ${prefpolldb.PORT}
       - key: APP_DATABASE__DATABASE_NAME
         scope: RUN_TIME
-        value: ${prefpoll.DATABASE}
+        value: ${prefpolldb.DATABASE}
 
 # provision a live postgres database
 databases:
