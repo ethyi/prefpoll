@@ -32,7 +32,7 @@ pub async fn create_poll(form: web::Form<FormData>, pool: web::Data<PgPool>) -> 
 pub async fn insert_poll(pool: &PgPool, form: &FormData) -> Result<(), sqlx::Error> {
     sqlx::query!(
         r#"
-        INSERT INTO poll (id, question, options, made_at)
+        INSERT INTO polls (id, question, options, created_at)
         VALUES ($1, $2, $3, $4)
         "#,
         Uuid::new_v4(), // new Uuiid

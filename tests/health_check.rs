@@ -12,82 +12,6 @@ use uuid::Uuid;
 // allow one call to init_subscriber
 use once_cell::sync::Lazy;
 
-// spins up new runtime for every test, resources always cleaned up
-#[tokio::test]
-async fn health_check_works() {
-    // run server, get address used
-    let app = spawn_app().await;
-    // create a client using reqwest
-    let client = reqwest::Client::new();
-    // execute request to get response
-    let response = client
-        .get(format!("{}/health_check", &app.address))
-        .send()
-        .await
-        .expect("Failed to execute request.");
-    // check if response is 200
-    assert!(response.status().is_success());
-    // check if response is empty body
-    assert_eq!(Some(0), response.content_length());
-}
-
-#[tokio::test]
-async fn create_poll_returns_a_200_for_valid_form_data() {
-    // Arrange
-    let app = spawn_app().await;
-    let client = reqwest::Client::new();
-
-    // Test correct post request
-    let body = "question=Example%20Title&options=[o1,o2]";
-    let response = client
-        .post(&format!("{}/create_poll", &app.address))
-        .header("Content-Type", "application/x-www-form-urlencoded")
-        .body(body)
-        .send()
-        .await
-        .expect("Failed to execute request.");
-    assert_eq!(200, response.status().as_u16());
-    // Test postgres update
-    let saved = sqlx::query!("SELECT question, options FROM poll")
-        .fetch_one(&app.db_pool)
-        .await
-        .expect("Failed to fetch saved poll");
-    assert_eq!(saved.question, "Example Title");
-    assert_eq!(saved.options, "[o1,o2]");
-}
-
-#[tokio::test]
-async fn create_poll_returns_a_400_when_data_is_missing() {
-    // Arrange
-    let app = spawn_app().await;
-    let client = reqwest::Client::new();
-    let test_cases = vec![
-        ("question=Example%20Title", "missing the options"),
-        ("options=[o1,o2]", "missing the question"),
-        // TODO check if more than two options
-        ("", "missing both question and options"),
-    ];
-    for (invalid_body, error_message) in test_cases {
-        // Act
-        let response = client
-            .post(&format!("{}/create_poll", &app.address))
-            .header("Content-Type", "application/x-www-form-urlencoded")
-            .body(invalid_body)
-            .send()
-            .await
-            .expect("Failed to execute request.");
-
-        // Assert
-        assert_eq!(
-            400,
-            response.status().as_u16(),
-            // Additional customised error message on test failure
-            "The API did not fail with 400 Bad Request when the payload was {}.",
-            error_message
-        );
-    }
-}
-
 // init_subscriber, invoked once through the entirety of cargo test
 static TRACING: Lazy<()> = Lazy::new(|| {
     let default_filter_level = "info".to_string();
@@ -159,4 +83,80 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .expect("Failed to migrate the database");
 
     connection_pool
+}
+
+// spins up new runtime for every test, resources always cleaned up
+#[tokio::test]
+async fn health_check_works() {
+    // run server, get address used
+    let app = spawn_app().await;
+    // create a client using reqwest
+    let client = reqwest::Client::new();
+    // execute request to get response
+    let response = client
+        .get(format!("{}/health_check", &app.address))
+        .send()
+        .await
+        .expect("Failed to execute request.");
+    // check if response is 200
+    assert!(response.status().is_success());
+    // check if response is empty body
+    assert_eq!(Some(0), response.content_length());
+}
+
+#[tokio::test]
+async fn create_poll_returns_a_200_for_valid_form_data() {
+    // Arrange
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+
+    // Test correct post request
+    let body = "question=Example%20Title&options=[o1,o2]";
+    let response = client
+        .post(&format!("{}/create_poll", &app.address))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(body)
+        .send()
+        .await
+        .expect("Failed to execute request.");
+    assert_eq!(200, response.status().as_u16());
+    // Test postgres update
+    let saved = sqlx::query!("SELECT question, options FROM polls")
+        .fetch_one(&app.db_pool)
+        .await
+        .expect("Failed to fetch saved poll");
+    assert_eq!(saved.question, "Example Title");
+    assert_eq!(saved.options, "[o1,o2]");
+}
+
+#[tokio::test]
+async fn create_poll_returns_a_400_when_data_is_missing() {
+    // Arrange
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+    let test_cases = vec![
+        ("question=Example%20Title", "missing the options"),
+        ("options=[o1,o2]", "missing the question"),
+        // TODO check if more than two options
+        ("", "missing both question and options"),
+    ];
+    for (invalid_body, error_message) in test_cases {
+        // Act
+        let response = client
+            .post(&format!("{}/create_poll", &app.address))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(invalid_body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+
+        // Assert
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            // Additional customised error message on test failure
+            "The API did not fail with 400 Bad Request when the payload was {}.",
+            error_message
+        );
+    }
 }
