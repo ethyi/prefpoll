@@ -23,6 +23,9 @@ uuid = { version = "0.8.1", features = ["v4"] }
 # for getting time
 chrono = "0.4.15"
 
+# handle integer parsing, parsing port number
+serde-aux="3"
+
 # LOGGING
 # record spans, structured events with information about start and end time
 tracing = { version = "0.1", features = ["log"] }
@@ -40,17 +43,19 @@ secrecy = { version = "0.8", features = ["serde"] }
 tracing-actix-web = "0.5"
 
 
+
+
 [dependencies.sqlx] #sqlx dependencies
 version = "0.5.7"
 default-features = false
 features = [
-	# use actix runtime for futures, rustls for transport level security
-	"runtime-actix-rustls", 
-	"macros", # query! macro
-	"postgres", # postgres specific, non-standard SQL types
-	"uuid", # mapping sql uuid to Uuid type
-	"chrono", # mapping sql timestamptz to DateTime<T>
-	"migrate" # sqlx-cli functionality, needed for testing
+"runtime-actix-rustls",#use actix runtime
+"macros", # sqlx::query!
+"postgres", # postgres-specific functionality
+"uuid", # uuid in sql
+"chrono", # map sql time to Rust DataTime type
+"migrate", # manage migrations
+"offline" # manage how the database can be accessed from docker
 ]
 
 # dependencies for tests, not included at final release

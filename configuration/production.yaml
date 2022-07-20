@@ -1,0 +1,6 @@
+# accept connections from any network interface
+application:
+  host: 0.0.0.0
+database:
+  # required for deployment
+  require_ssl: true

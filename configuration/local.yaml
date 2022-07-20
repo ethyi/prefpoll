@@ -1,0 +1,7 @@
+
+# ip of local computer
+application:
+  host: 127.0.0.1
+database:
+  # not needed for local development
+  require_ssl: false
