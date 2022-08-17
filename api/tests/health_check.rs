@@ -5,7 +5,6 @@ use prefpoll::{
     startup::run,
     telemetry::init_subscriber,
 };
-use secrecy::ExposeSecret;
 use sqlx::{Connection, Executor, PgConnection, PgPool};
 use uuid::Uuid;
 
@@ -62,7 +61,7 @@ async fn spawn_app() -> TestApp {
 async fn configure_database(config: &DatabaseSettings) -> PgPool {
     // connect to postgres instance
     let mut connection =
-        PgConnection::connect(&config.connection_string_without_db().expose_secret())
+        PgConnection::connect_with(&config.without_db())
             .await
             .expect("Failed to connect to Postgres");
 
@@ -73,7 +72,7 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .expect("Failed to create database.");
 
     // Migrate database
-    let connection_pool = PgPool::connect(&config.connection_string().expose_secret())
+    let connection_pool = PgPool::connect_with(config.with_db())
         .await
         .expect("Failed to connect to Postgres.");
 
@@ -111,7 +110,7 @@ async fn create_poll_returns_a_200_for_valid_form_data() {
     let client = reqwest::Client::new();
 
     // Test correct post request
-    let body = "question=Example%20Title&options=[o1,o2]";
+    let body = r#"question=Example%20Title&options=["o1","o2"]"#;
     let response = client
         .post(&format!("{}/create_poll", &app.address))
         .header("Content-Type", "application/x-www-form-urlencoded")
@@ -120,13 +119,22 @@ async fn create_poll_returns_a_200_for_valid_form_data() {
         .await
         .expect("Failed to execute request.");
     assert_eq!(200, response.status().as_u16());
+    let content = response.text().await.expect("failed to get body:");
     // Test postgres update
-    let saved = sqlx::query!("SELECT question, options FROM polls")
+    let saved = sqlx::query!("SELECT * FROM polls")
         .fetch_one(&app.db_pool)
         .await
         .expect("Failed to fetch saved poll");
+
+
+    assert_eq!(saved.id.to_string(), content);
+
+
     assert_eq!(saved.question, "Example Title");
-    assert_eq!(saved.options, "[o1,o2]");
+    assert_eq!(saved.options, r#"["o1","o2"]"#);
+    assert_eq!(saved.results, "{}");
+    assert_eq!(saved.ranking, "[[0,1]]");
+    assert_eq!(saved.total_votes, 0);
 }
 
 #[tokio::test]
