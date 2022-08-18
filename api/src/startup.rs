@@ -1,7 +1,7 @@
 // listener binds to port, needed to get port for testing purposes
 use std::net::TcpListener;
 
-use crate::routes::{create_poll, health_check,vote};
+use crate::routes::{create_poll, health_check,vote,add_vote};
 use actix_web::dev::Server; // import Server type
 use actix_web::{web, App, HttpServer};
 use sqlx::PgPool;
@@ -23,8 +23,9 @@ pub fn run(listener: TcpListener, pool: PgPool) -> Result<Server, std::io::Error
             // post update database with a new poll, return id of poll
             .route("/create_poll", web::post().to(create_poll))
             // get details for voting page
-            .route("/vote",web::get().to(vote) )
+            .route("/vote/{id}",web::get().to(vote) )
             // post update results with vote
+            .route("/add_vote/{id}", web::post().to(add_vote))
             // get details of results
             .app_data(pool.clone()) // attach database connection to state
     })

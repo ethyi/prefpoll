@@ -168,3 +168,131 @@ async fn create_poll_returns_a_400_when_data_is_missing() {
         );
     }
 }
+
+#[tokio::test]
+async fn vote_returns_valid_poll_data() {
+    // startup server and extract body
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+
+    let body = r#"question=Example%20Title&options=["o1","o2"]"#;
+    let response = client
+        .post(&format!("{}/create_poll", &app.address))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(body)
+        .send()
+        .await
+        .expect("Failed to execute request.");
+    let content = response.text().await.expect("failed to get body:");
+
+    // execute request to get response
+    let response = client
+        .get(format!("{}/vote/{}", &app.address, &content))
+        .send()
+        .await
+        .expect("Failed to execute request.");
+    // check if response is 200
+    assert!(response.status().is_success());
+
+    assert!(response.content_length().is_some());
+
+    // println!("{}", response.text().await.expect("Failed to get body of GET vote/id"));
+}
+
+
+#[tokio::test]
+async fn add_vote_returns_200_for_valid_vote_data() {
+    // startup server and extract body
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+
+    let body = r#"question=Example%20Title&options=["one","two","three"]"#;
+    let response = client
+        .post(&format!("{}/create_poll", &app.address))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(body)
+        .send()
+        .await
+        .expect("Failed to execute request.");
+    let id = response.text().await.expect("failed to get body:");
+
+    // bad input post check [2,1] [2,2,1] 
+    let test_cases = vec![
+        ("order=[[2,1,0]]", "valid 1 vec"),
+        ("order=[[2,1],[0]]", "valid 2 vec"),
+        ("order=[[1],[2],[0]]", "valid 3 vec"),
+    ];
+    for (body, message) in test_cases {
+        // Act
+        let response = client
+            .post(format!("{}/add_vote/{}", &app.address, &id))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+
+        // Assert
+        assert_eq!(
+            200,
+            response.status().as_u16(),
+            // Additional customised error message on test failure
+            "The API did not succeed with 200 when the payload was {}.",
+            message
+        );
+    }
+    // TODO 
+    // check total votes, hashmap, and rank makes sense
+}
+
+#[tokio::test]
+async fn add_vote_returns_400_for_valid_vote_data() {
+    // startup server and extract body
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+
+    let body = r#"question=Example%20Title&options=["one","two","three"]"#;
+    let response = client
+        .post(&format!("{}/create_poll", &app.address))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(body)
+        .send()
+        .await
+        .expect("Failed to execute request.");
+    let id = response.text().await.expect("failed to get id");
+
+
+    let test_cases = vec![
+        ("order=[2,1,0]", "invalid single vec"),
+        ("order=[[2,1,0]]]", "invalid extra bracket"),
+        ("order=[[2,1,3]]", "invalid out of bounds indices"),
+        ("order=[[2,2,0]]", "invalid duplicate indices"),
+        ("order=[[2,1,0],[1]]", "invalid duplicate indices / number of options"),
+        ("order=[[2,1,0],[3]]", "invalid number of options: 2 vecs"),
+        ("order=[[2,1,3,0]]", "invalid number of options: 1 vec"),
+        ("", "missing all input"),
+    ];
+    for (invalid_body, error_message) in test_cases {
+        // Act
+        let response = client
+            .post(format!("{}/add_vote/{}", &app.address, &id))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(invalid_body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+
+        // Assert
+        assert_eq!(
+            400,
+            response.status().as_u16(),
+            // Additional customised error message on test failure
+            "The API did not fail with 400 Bad Request when the payload was {}.",
+            error_message
+        );
+
+        // println!("{}", response.text().await.unwrap());
+    }
+
+
+}
