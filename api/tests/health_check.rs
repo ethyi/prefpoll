@@ -60,10 +60,9 @@ async fn spawn_app() -> TestApp {
 // Creates a testing database separate from the primary
 async fn configure_database(config: &DatabaseSettings) -> PgPool {
     // connect to postgres instance
-    let mut connection =
-        PgConnection::connect_with(&config.without_db())
-            .await
-            .expect("Failed to connect to Postgres");
+    let mut connection = PgConnection::connect_with(&config.without_db())
+        .await
+        .expect("Failed to connect to Postgres");
 
     // create database
     connection
@@ -126,15 +125,14 @@ async fn create_poll_returns_a_200_for_valid_form_data() {
         .await
         .expect("Failed to fetch saved poll");
 
-
     assert_eq!(saved.id.to_string(), content);
-
 
     assert_eq!(saved.question, "Example Title");
     assert_eq!(saved.options, r#"["o1","o2"]"#);
     assert_eq!(saved.results, "{}");
     assert_eq!(saved.ranking, "[[0,1]]");
     assert_eq!(saved.total_votes, 0);
+    assert_eq!(saved.number_options, 2);
 }
 
 #[tokio::test]
@@ -199,7 +197,6 @@ async fn vote_returns_valid_poll_data() {
     // println!("{}", response.text().await.expect("Failed to get body of GET vote/id"));
 }
 
-
 #[tokio::test]
 async fn add_vote_returns_200_for_valid_vote_data() {
     // startup server and extract body
@@ -216,11 +213,10 @@ async fn add_vote_returns_200_for_valid_vote_data() {
         .expect("Failed to execute request.");
     let id = response.text().await.expect("failed to get body:");
 
-    // bad input post check [2,1] [2,2,1] 
+    // bad input post check [2,1] [2,2,1]
     let test_cases = vec![
-        ("order=[[2,1,0]]", "valid 1 vec"),
-        ("order=[[2,1],[0]]", "valid 2 vec"),
-        ("order=[[1],[2],[0]]", "valid 3 vec"),
+        ("order=[2,1,0]", "valid 1 vec"),
+        ("order=[0,1,2]", "valid 1 vec"),
     ];
     for (body, message) in test_cases {
         // Act
@@ -241,12 +237,12 @@ async fn add_vote_returns_200_for_valid_vote_data() {
             message
         );
     }
-    // TODO 
+    // TODO
     // check total votes, hashmap, and rank makes sense
 }
 
 #[tokio::test]
-async fn add_vote_returns_400_for_valid_vote_data() {
+async fn add_vote_returns_400_for_invalid_vote_data() {
     // startup server and extract body
     let app = spawn_app().await;
     let client = reqwest::Client::new();
@@ -261,15 +257,22 @@ async fn add_vote_returns_400_for_valid_vote_data() {
         .expect("Failed to execute request.");
     let id = response.text().await.expect("failed to get id");
 
-
     let test_cases = vec![
-        ("order=[2,1,0]", "invalid single vec"),
-        ("order=[[2,1,0]]]", "invalid extra bracket"),
-        ("order=[[2,1,3]]", "invalid out of bounds indices"),
-        ("order=[[2,2,0]]", "invalid duplicate indices"),
-        ("order=[[2,1,0],[1]]", "invalid duplicate indices / number of options"),
-        ("order=[[2,1,0],[3]]", "invalid number of options: 2 vecs"),
+        // ("order=[2,1,0]", "invalid single vec"),
+        // ("order=[[2,1,0]]]", "invalid extra bracket"),
+        // ("order=[[2,1,3]]", "invalid out of bounds indices"),
+        // ("order=[[2,2,0]]", "invalid duplicate indices"),
+        // ("order=[[2,1,0],[1]]", "invalid duplicate indices / number of options"),
+        // ("order=[[2,1,0],[3]]", "invalid number of options: 2 vecs"),
+        // ("order=[[2,1,3,0]]", "invalid number of options: 1 vec"),
+        // ("", "missing all input"),
+        ("order=[[2,1,0]]", "invalid double vec"),
+        ("order=[[2,1,0]", "invalid extra bracket"),
+        ("order=[2,1,3]", "invalid out of bounds indices"),
+        ("order=[2,1,-1]", "invalid out of bounds indices"),
+        ("order=[2,2,0]", "invalid duplicate indices"),
         ("order=[[2,1,3,0]]", "invalid number of options: 1 vec"),
+        ("order=1,0,2", "invalid, just numbers no brackets"),
         ("", "missing all input"),
     ];
     for (invalid_body, error_message) in test_cases {
@@ -293,6 +296,4 @@ async fn add_vote_returns_400_for_valid_vote_data() {
 
         // println!("{}", response.text().await.unwrap());
     }
-
-
 }
