@@ -1,6 +1,7 @@
 html {
   box-sizing: border-box;
 }
+
 body {
   position: relative;
   min-height: 100vh;
@@ -11,6 +12,7 @@ body {
 *:after {
   box-sizing: inherit;
 }
+
 :root {
   --margin-width: 12%;
 }
@@ -48,6 +50,7 @@ body {
   width: var(--margin-width);
   pointer-events: none;
 }
+
 .red-margin-input {
   position: absolute;
   height: 50px;
@@ -56,6 +59,7 @@ body {
   width: var(--margin-width);
   pointer-events: none;
 }
+
 .question {
   width: 100%;
 
@@ -72,6 +76,7 @@ body {
 input:focus {
   outline: none;
 }
+
 .question .question-input {
   background-color: transparent;
   border-color: transparent;
@@ -136,6 +141,7 @@ input:focus {
   line-height: 20px;
   letter-spacing: 0.6px;
 }
+
 .option-number {
   display: flex;
   width: var(--margin-width);
@@ -157,6 +163,7 @@ input:focus {
 .draggable {
   cursor: move;
 }
+
 .draggable.dragging {
   opacity: 1;
   color: blue;
@@ -193,17 +200,13 @@ input:focus {
   --headline-gradient-end: #009de4;
   --headline-gradient-shimmer: #5ac8fa;
 
-  background-image: linear-gradient(
-      var(--gradient-shimmer-angle),
+  background-image: linear-gradient(var(--gradient-shimmer-angle),
       transparent calc(50% - var(--gradient-highlight-spread)),
       var(--headline-gradient-shimmer),
-      transparent calc(50% + var(--gradient-highlight-spread))
-    ),
-    linear-gradient(
-      var(--headline-gradient-direction),
+      transparent calc(50% + var(--gradient-highlight-spread))),
+    linear-gradient(var(--headline-gradient-direction),
       var(--headline-gradient-start),
-      var(--headline-gradient-end)
-    );
+      var(--headline-gradient-end));
 
   background-repeat: no-repeat;
   background-size: 200% 100%, 100% 100%;
@@ -213,13 +216,17 @@ input:focus {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
 .title h2 {
   font-size: 1.2rem;
   color: rgb(107, 107, 107);
 }
+
 #content-wrap {
-  padding-bottom: 7rem; /* Footer height */
+  padding-bottom: 7rem;
+  /* Footer height */
 }
+
 footer {
   /* background-color: #cacacab1; */
   padding: 2.5rem;
@@ -233,10 +240,12 @@ footer {
   font-size: 1rem;
   text-align: center;
 }
+
 .copyright {
   margin: auto;
 }
-.total-votes {
+
+.poll-stats {
   padding-top: 10px;
   padding-left: 100px;
   font-size: 1.2 rem;

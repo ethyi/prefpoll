@@ -1,13 +1,13 @@
-
+// automatically add another input field if the last input field is not empty
 function createInput(event) {
   // remove event listener
   const targetElement = event.target || event.srcElement;
-  targetElement.removeEventListener("input",createInput);
+  targetElement.removeEventListener("input", createInput);
 
   // establish correct id number
-  const parentList = document.getElementById("list"); 
+  const parentList = document.getElementById("list");
   const numChildren = parentList.childElementCount;
-  const newName = "option" + (numChildren+1);
+  const newName = "option" + (numChildren + 1);
 
   // create new input element to append
   const newInput = document.createElement("input");
@@ -23,9 +23,11 @@ function createInput(event) {
   parentList.appendChild(newInput);
 }
 
+// add event listener to last input
 const element = document.getElementById("option3");
 if (element) {
-element.addEventListener("input", createInput);}
+  element.addEventListener("input", createInput);
+}
 
 // dragging script
 const draggables = document.querySelectorAll('.draggable')
@@ -41,20 +43,19 @@ draggables.forEach(draggable => {
     draggable.classList.remove('dragging')
 
   })
-  
+
 })
 
-
-  container.addEventListener('dragover', e => {
-    e.preventDefault()
-    const afterElement = getDragAfterElement(e.clientY)
-    const draggable = document.querySelector('.dragging')
-    if (afterElement == null) {
-      container.appendChild(draggable)
-    } else {
-      container.insertBefore(draggable, afterElement)
-    }
-  })
+container.addEventListener('dragover', e => {
+  e.preventDefault()
+  const afterElement = getDragAfterElement(e.clientY)
+  const draggable = document.querySelector('.dragging')
+  if (afterElement == null) {
+    container.appendChild(draggable)
+  } else {
+    container.insertBefore(draggable, afterElement)
+  }
+})
 
 function getDragAfterElement(y) {
   const draggableElements = [...container.querySelectorAll('.draggable:not(.dragging)')]
@@ -68,4 +69,27 @@ function getDragAfterElement(y) {
       return closest
     }
   }, { offset: Number.NEGATIVE_INFINITY }).element
+}
+
+// click to copy link script
+function copyVote() {
+  const id = document.getElementById("id").value;
+  const host = "localhost:3000";
+  const text = `${host}/vote/${id}`;
+
+  /* Copy the text inside the text field */
+  navigator.clipboard.writeText(text);
+
+  // alert that you have copied
+}
+// click to copy link script
+function copyResult() {
+  const id = document.getElementById("id").value;
+  const host = "localhost:3000";
+  const text = `${host}/vote/${id}/r`;
+
+  /* Copy the text inside the text field */
+  navigator.clipboard.writeText(text);
+
+  // alert that you have copied
 }
