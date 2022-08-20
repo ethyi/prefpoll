@@ -1,7 +1,8 @@
-use std::net::TcpListener;
+use std::{collections::HashMap, net::TcpListener};
 
 use prefpoll::{
     configuration::{get_configuration, DatabaseSettings},
+    routes::calculate_poll_results,
     startup::run,
     telemetry::init_subscriber,
 };
@@ -239,6 +240,33 @@ async fn add_vote_returns_200_for_valid_vote_data() {
     }
     // TODO
     // check total votes, hashmap, and rank makes sense
+    let saved = sqlx::query!("SELECT * FROM polls")
+        .fetch_one(&app.db_pool)
+        .await
+        .expect("Failed to fetch saved poll");
+    println!("{}", saved.results);
+    println!("{}", saved.ranking);
+    // assert_eq!(saved.id.to_string(), content);
+    assert_eq!(saved.total_votes, 2);
+}
+
+#[test]
+// calculate_poll algorithim test
+fn result_calculation_test() {
+    let mut test_cases: Vec<Vec<usize>> = Vec::new();
+    test_cases.append(&mut vec![vec![0, 2, 1]; 4]);
+    test_cases.append(&mut vec![vec![1, 0, 2]; 2]);
+    test_cases.append(&mut vec![vec![2, 0, 1]; 1]);
+    let mut results: HashMap<String, usize> = HashMap::new();
+    let total_votes = test_cases.len();
+    let num_options = test_cases[0].len();
+    for vec in test_cases {
+        let vec_string = serde_json::to_string(&vec).unwrap();
+        *results.entry(vec_string).or_insert(0) += 1;
+    }
+    let rankings = calculate_poll_results(&results, total_votes, num_options);
+    println!("{:?}", rankings);
+    assert_eq!(rankings, [[0], [2], [1]]);
 }
 
 #[tokio::test]

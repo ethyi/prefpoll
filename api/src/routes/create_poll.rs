@@ -56,7 +56,7 @@ pub async fn insert_poll(pool: &PgPool, form: &FormData) -> Result<Uuid, sqlx::E
         form.question,  // pass in form data
         form.options, // "["one","two","three"]", de to Vec<String>
         options_len,
-        results, // de to hashmap<order, frequency>
+        results, // de to hashmap<order, frequency> order as serialized vec
         ranking, // "[[3,2,1]]" de to Vec<Vec<usize>>
         total_votes,
         Utc::now() // pass in current time
