@@ -214,7 +214,6 @@ async fn add_vote_returns_200_for_valid_vote_data() {
         .expect("Failed to execute request.");
     let id = response.text().await.expect("failed to get body:");
 
-    // bad input post check [2,1] [2,2,1]
     let test_cases = vec![
         ("order=[2,1,0]", "valid 1 vec"),
         ("order=[0,1,2]", "valid 1 vec"),
@@ -324,4 +323,52 @@ async fn add_vote_returns_400_for_invalid_vote_data() {
 
         // println!("{}", response.text().await.unwrap());
     }
+}
+#[tokio::test]
+async fn result_returns_valid_result_data() {
+    let app = spawn_app().await;
+    let client = reqwest::Client::new();
+
+    let body = r#"question=Example%20Title&options=["one","two","three"]"#;
+    let response = client
+        .post(&format!("{}/create_poll", &app.address))
+        .header("Content-Type", "application/x-www-form-urlencoded")
+        .body(body)
+        .send()
+        .await
+        .expect("Failed to execute request.");
+    let id = response.text().await.expect("failed to get body:");
+
+    let test_cases = vec![
+        ("order=[2,1,0]", "valid 1 vec"),
+        ("order=[0,1,2]", "valid 1 vec"),
+    ];
+    for (body, _) in test_cases {
+        client
+            .post(format!("{}/add_vote/{}", &app.address, &id))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .body(body)
+            .send()
+            .await
+            .expect("Failed to execute request.");
+    }
+
+    // execute request to get response
+    let response = client
+        .get(format!("{}/vote/{}/r", &app.address, &id))
+        .send()
+        .await
+        .expect("Failed to execute request.");
+    // check if response is 200
+    assert!(response.status().is_success());
+
+    assert!(response.content_length().is_some());
+
+    println!(
+        "{}",
+        response
+            .text()
+            .await
+            .expect("Failed to get body of GET vote/id/r")
+    );
 }
