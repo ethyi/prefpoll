@@ -50,7 +50,7 @@ function PollForm() {
     )}&duplication=${duplication.current}`;
     // console.log(formString);
     axios
-      .post("http://localhost:8000/create_poll", formString)
+      .post(`${process.env.NEXT_PUBLIC_API}/create_poll`, formString)
       .then((response) => {
         // console.log(`statusCode: ${response.status}`);
         let id = response.data;

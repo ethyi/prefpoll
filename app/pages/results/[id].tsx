@@ -96,7 +96,7 @@ export default function Result() {
     if (!router.isReady) return;
     const { id, err } = router.query;
     axios
-      .get(`http://localhost:8000/vote/${id}/r`)
+      .get(`${process.env.NEXT_PUBLIC_API}/vote/${id}/r`)
       .then((res) => {
         let data = res.data;
         // console.log(data);

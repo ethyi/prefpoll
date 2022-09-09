@@ -33,7 +33,7 @@ function VoteForm({ poll }: { poll: Poll }) {
     });
     const formString = "order=[" + options.map((o) => optionToIndex[o]) + "]";
     axios
-      .post("http://localhost:8000/add_vote/" + poll.id, formString)
+      .post(`${process.env.NEXT_PUBLIC_API}/add_vote/${poll.id}`, formString)
       .then((response) => {
         // console.log(`statusCode: ${response.status}`);
         setCookie(poll.id, true, { sameSite: "lax" });
@@ -126,7 +126,7 @@ export default function Vote() {
     const { id } = router.query;
     if (typeof id !== "string") return;
     axios
-      .get(`http://localhost:8000/vote/${id}`)
+      .get(`${process.env.NEXT_PUBLIC_API}/vote/${id}`)
 
       .then((res) => {
         let data = res.data;
