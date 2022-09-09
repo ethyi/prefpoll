@@ -1,4 +1,4 @@
-use actix_web::{dev::ConnectionInfo, web, HttpResponse, Responder};
+use actix_web::{dev::ConnectionInfo, http::header::ContentType, web, HttpResponse, Responder};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -25,7 +25,9 @@ pub async fn vote(
     match get_vote_info(connection, id, &pool).await {
         Ok(vote_info) => {
             let vote_info = serde_json::to_string(&vote_info).expect("serialization failed");
-            HttpResponse::Ok().body(vote_info)
+            HttpResponse::Ok()
+                .content_type(ContentType::json())
+                .body(vote_info)
         }
         Err(_) => HttpResponse::NotFound().body("sql query failed: id not found"),
     }

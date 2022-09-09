@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{http::header::ContentType, web, HttpResponse, Responder};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -20,7 +20,9 @@ pub async fn result(info: web::Path<String>, pool: web::Data<PgPool>) -> impl Re
     match get_result_info(id, &pool).await {
         Ok(result_info) => {
             let result_info = serde_json::to_string(&result_info).expect("serialization failed");
-            HttpResponse::Ok().body(result_info)
+            HttpResponse::Ok()
+                .content_type(ContentType::json())
+                .body(result_info)
         }
         Err(_) => HttpResponse::NotFound().body("sql query failed: id not found"),
     }

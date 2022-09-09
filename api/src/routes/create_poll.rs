@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse};
+use actix_web::{http::header::ContentType, web, HttpResponse};
 use chrono::Utc;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -24,7 +24,9 @@ pub struct FormData {
 // a connection from the pool to execute. Allows concurrent queries
 pub async fn create_poll(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
     match insert_poll(&pool, &form).await {
-        Ok(id) => HttpResponse::Ok().body(id.to_hyphenated().to_string()),
+        Ok(id) => HttpResponse::Ok()
+            .content_type(ContentType::json())
+            .body(id.to_hyphenated().to_string()),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
 }

@@ -7,10 +7,10 @@ services:
 
     # Relative to the repository root
     dockerfile_path: Dockerfile
-    source_dir: .
+    source_dir: ./api
 
     # github settings
-    github: 
+    github:
       branch: main
       deploy_on_push: true
       repo: ethyi/prefpoll
@@ -54,4 +54,3 @@ databases:
     size: db-s-dev-database
     # Postgres version
     version: "12"
-
