@@ -6,8 +6,8 @@ services:
   - name: prefpoll
 
     # Relative to the repository root
-    dockerfile_path: /api/Dockerfile
-    source_dir: /api
+    dockerfile_path: ./api/Dockerfile
+    source_dir: ./api
 
     # github settings
     github:

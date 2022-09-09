@@ -1,6 +1,96 @@
 {
   "db": "PostgreSQL",
-  "3d962216c6c7ff0f02907f1c7ff5984241cf0381f0992ea2c75cb72c8d76f0e2": {
+  "21625b7cdd0487215879d7bdb28cb311ba72e966c02e562f0fc80d06258a60be": {
+    "describe": {
+      "columns": [
+        {
+          "name": "question",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "options",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "total_votes",
+          "ordinal": 3,
+          "type_info": "Int8"
+        },
+        {
+          "name": "ranking",
+          "ordinal": 4,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "SELECT question, options, created_at, total_votes, ranking FROM polls WHERE id = $1"
+  },
+  "363a34bdea5b2e75a6fe8d37ed522568ecae31d702514e775e1c80150f93d183": {
+    "describe": {
+      "columns": [
+        {
+          "name": "number_options",
+          "ordinal": 0,
+          "type_info": "Int2"
+        },
+        {
+          "name": "results",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "total_votes",
+          "ordinal": 2,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "SELECT number_options, results, total_votes FROM polls WHERE id = $1"
+  },
+  "4acc656d32298d5a7775354e4253fa00e0539bfb9c924f4c84164062af40d9e5": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Uuid",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO ip(ip_id, id, address)\n        VALUES ($1, $2, $3)\n        "
+  },
+  "573b6b07387283cc635481b246551a50ee5742b40a6de80b059433a4be3c4dbc": {
     "describe": {
       "columns": [],
       "nullable": [],
@@ -9,10 +99,101 @@
           "Uuid",
           "Text",
           "Text",
-          "Timestamptz"
+          "Int8"
         ]
       }
     },
-    "query": "\n        INSERT INTO polls (id, question, options, created_at)\n        VALUES ($1, $2, $3, $4)\n        "
+    "query": "UPDATE polls SET results=$2, ranking=$3, total_votes=$4 WHERE id = $1"
+  },
+  "89813900f3a1bc13bb5ec736ceb48e666242d9b7c32b900d231268640ab15e5f": {
+    "describe": {
+      "columns": [
+        {
+          "name": "ip_id",
+          "ordinal": 0,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "id",
+          "ordinal": 1,
+          "type_info": "Uuid"
+        },
+        {
+          "name": "address",
+          "ordinal": 2,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Uuid"
+        ]
+      }
+    },
+    "query": "SELECT * FROM ip WHERE address = $1 AND id = $2"
+  },
+  "d7fa694eeb097232c4812eb10b4d6e54147ac95ee1c6768b68d8eadb4a1630c8": {
+    "describe": {
+      "columns": [
+        {
+          "name": "question",
+          "ordinal": 0,
+          "type_info": "Text"
+        },
+        {
+          "name": "options",
+          "ordinal": 1,
+          "type_info": "Text"
+        },
+        {
+          "name": "created_at",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "duplication",
+          "ordinal": 3,
+          "type_info": "Text"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Uuid"
+        ]
+      }
+    },
+    "query": "SELECT question, options, created_at, duplication FROM polls WHERE id = $1"
+  },
+  "f0bc8f1800241398a9598cea8a3112d1496e50aca7919d6d71c512d859c1ecc5": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Uuid",
+          "Text",
+          "Text",
+          "Int2",
+          "Text",
+          "Text",
+          "Int8",
+          "Timestamptz",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n        INSERT INTO polls (id, question, options, number_options, results, ranking, total_votes, created_at, duplication)\n        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)\n        "
   }
 }
