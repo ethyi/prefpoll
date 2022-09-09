@@ -5,7 +5,7 @@
 # dependencies
 /app/node_modules
 /app/.pnp
-/app.pnp.js
+/app/.pnp.js
 
 # testing
 /app/coverage
@@ -18,21 +18,21 @@
 /app/build
 
 # misc
-/app.DS_Store
-/app*.pem
+/app/.DS_Store
+/app/*.pem
 
 # debug
-/appnpm-debug.log*
-/appyarn-debug.log*
-/appyarn-error.log*
-/app.pnpm-debug.log*
+/app/npm-debug.log*
+/app/yarn-debug.log*
+/app/yarn-error.log*
+/app/.pnpm-debug.log*
 
 # local env files
-/app.env*.local
+/app/.env*.local
 
 # vercel
-/app.vercel
+/app/.vercel
 
 # typescript
-/app*.tsbuildinfo
-/appnext-env.d.ts
+/app/*.tsbuildinfo
+/app/next-env.d.ts
