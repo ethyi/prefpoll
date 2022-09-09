@@ -1,24 +1,33 @@
-# Prefpoll
+# Pref Poll
 A preference based voting webapp.
 
-![Selection_014](https://user-images.githubusercontent.com/37843741/188291387-7836c35e-7a64-4b9b-9963-610f6a8b2fa0.png)
+[Writeup on  my inspiration](https://ethyi.de/posts/prefpoll)
 
-Took inspiration from the simple UI of strawpoll (RIP).
+[Deployed App](https://prefpoll.vercel.app/)
 
-Made with JS (EJS,express), Rust(actix_web,sqlx), and postgresql.
+![image|200](https://user-images.githubusercontent.com/37843741/189427611-506713af-2b15-4779-b900-c3951535ced4.png)
 
-I was going to publish this online but it costs too much and I haven't secured the API.
-I've pivoted career paths so I'm putting this on hold.
 
-## Road to deployment
-1. Rate limit api calls
-2. Limit options
-3. IP and Cookie duplication check
-4. Google Ads to fund it (?)
+## Stack
+- Frontend
+  - Typescript
+    - React.js
+    - Next.js
+- Backend
+  - Rust
+    - Actix Web
+    - Sqlx
+  - Postgresql
+  - Docker
+- Hosts
+  - Vercel
+  - Digital Ocean
 
-## Additional features
-1. Frontend typescript, React, with SSR refactor
-2. Make the dragging look nicer
-3. Maybe turn into full Rust app with Yew?
-4. Voting percentages (more complicated than you think)
-5. Option to chose voting algorithm (RCV, borda count, ... like 20 others, look at wiki)
+
+
+## Planned features
+
+- Voting percentages for all ranks (more complicated than you think)
+- Option to chose voting algorithm (RCV, ranked pairs, borda count, ... like 20 others)
+- Comment system
+- Email token vote links
