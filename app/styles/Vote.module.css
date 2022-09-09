@@ -1,0 +1,116 @@
+.poll {
+  background-color: #f5f5f5;
+
+  width: 700px;
+
+  position: relative;
+  display: flex;
+
+  flex-direction: column;
+}
+
+.redMargin {
+  position: absolute;
+  height: 100%;
+  border-right: 2px solid #ca302c;
+
+  width: 12%;
+  pointer-events: none;
+}
+
+.notepadLines {
+  position: absolute;
+  border-bottom: black 1px solid;
+  width: 700px;
+}
+
+.question {
+  width: 100%;
+
+  border: solid;
+  border-color: black;
+  border-width: 0 0 1px 0;
+  margin: 0;
+  padding: 0;
+  height: 90px;
+  background: transparent;
+  position: relative;
+}
+
+.questionDisplay {
+  cursor: text;
+  padding: 40px;
+  padding-left: 100px;
+  font-size: 1.7rem;
+  line-height: 20px;
+  letter-spacing: 0.6px;
+  display: flex;
+}
+.optionDragging {
+  background-color: rgb(220, 220, 220);
+}
+.optionDisplay {
+  display: flex;
+  height: 50px;
+  cursor: text;
+
+  width: 100%;
+
+  font-size: 1.2rem;
+  line-height: 20px;
+  letter-spacing: 0.6px;
+}
+.optionDisplay div:hover {
+  background-color: rgb(234, 234, 234);
+}
+
+.numberAndOptionContainer {
+  display: flex;
+}
+.numbersContainer {
+  width: 12%;
+}
+.optionsContainer {
+  flex-grow: 1;
+  /* width: 88%; */
+}
+.optionNumber {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.3rem;
+  height: 50px;
+}
+
+.optionText {
+  flex-grow: 1;
+  display: flex;
+  padding: 15px;
+  padding-left: calc(100px-var(12%));
+  font-size: 1.2rem;
+  line-height: 20px;
+  letter-spacing: 0.6px;
+}
+
+.pollButtons {
+  height: 7rem;
+  flex-grow: 1;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+/* .draggable {
+  cursor: move;
+}
+
+.draggable.dragging {
+  opacity: 1;
+  color: blue;
+  outline: solid 2px black;
+  border: none;
+} */
+.pollStats {
+  padding-top: 10px;
+  padding-left: 100px;
+  font-size: 1.2 rem;
+}

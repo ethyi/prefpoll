@@ -2,6 +2,7 @@
 use std::net::TcpListener;
 
 use crate::routes::{add_vote, create_poll, health_check, result, vote};
+use actix_cors::Cors;
 use actix_web::dev::Server; // import Server type
 use actix_web::{web, App, HttpServer};
 use sqlx::PgPool;
@@ -13,11 +14,13 @@ pub fn run(listener: TcpListener, pool: PgPool) -> Result<Server, std::io::Error
     let pool = web::Data::new(pool);
     // main server, handles transport level concerns
     let server = HttpServer::new(move || {
+        let cors = Cors::permissive();
         // app is where the application logic and route handlers live
         // each worker has their own copy of App with its own PgConnection
         App::new()
             // attach logger to app
             .wrap(TracingLogger::default())
+            .wrap(cors)
             // attach health check handler
             .route("/health_check", web::get().to(health_check))
             // post update database with a new poll, return id of poll

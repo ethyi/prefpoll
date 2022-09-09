@@ -1,0 +1,77 @@
+/* ////////////////////////// POLL CREATION ///////////////////////////// */
+.poll {
+  background-color: #f5f5f5;
+
+  width: 700px;
+
+  position: relative;
+  display: flex;
+
+  flex-direction: column;
+}
+
+.redMargin {
+  position: absolute;
+  height: 100%;
+  border-right: 2px solid #ca302c;
+
+  width: 12%;
+  pointer-events: none;
+}
+
+.questionInput {
+  width: 100%;
+
+  border: solid;
+  border-color: black;
+  border-width: 0 0 1px 0;
+  margin: 0;
+  padding: 0;
+  height: 90px;
+  background: transparent;
+  position: relative;
+
+  /* background-color: transparent;
+  border-color: transparent;
+  width: inherit;
+  height: inherit; */
+
+  cursor: text;
+  padding: 15px;
+  padding-left: 100px;
+  font-size: 1.7rem;
+  line-height: 20px;
+  letter-spacing: 0.6px;
+}
+
+.optionInput {
+  background-color: transparent;
+  border-color: transparent;
+  height: 50px;
+  cursor: text;
+  padding: 5px;
+  padding-left: 100px;
+  font-size: 1.2rem;
+  line-height: 20px;
+  letter-spacing: 0.6px;
+
+  width: 100%;
+
+  border: solid;
+  border-color: black;
+  border-width: 0 0 1px 0;
+}
+
+.pollCreate {
+  height: 14rem;
+  flex-grow: 1;
+  display: flex;
+  /* flex-direction: column; */
+  justify-content: space-evenly;
+  align-items: center;
+  /* margin-left: 20%; */
+}
+.radioLabel {
+  color: black;
+  font-weight: 200;
+}

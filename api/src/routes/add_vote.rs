@@ -1,6 +1,6 @@
 use std::collections::{HashMap, HashSet};
 
-use actix_web::{web, HttpResponse, Responder};
+use actix_web::{dev::ConnectionInfo, web, HttpResponse, Responder};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -16,6 +16,7 @@ pub struct Poll {
 }
 
 pub async fn add_vote(
+    connection: ConnectionInfo,
     form: web::Form<FormData>,
     info: web::Path<String>,
     pool: web::Data<PgPool>,
@@ -55,7 +56,7 @@ pub async fn add_vote(
         .or_insert(0) += 1;
     let rankings = calculate_poll_results(&results, total_votes, poll.num_options);
 
-    match update_poll_details(id, &pool, results, rankings, total_votes).await {
+    match update_poll_details(connection, id, &pool, results, rankings, total_votes).await {
         Ok(_) => HttpResponse::Ok().finish(),
         Err(_) => HttpResponse::InternalServerError().finish(),
     }
@@ -63,6 +64,7 @@ pub async fn add_vote(
 
 // update to sql, new total votes, rankings, results
 pub async fn update_poll_details(
+    connection: ConnectionInfo,
     id: Uuid,
     pool: &PgPool,
     results: HashMap<String, usize>,
@@ -81,6 +83,25 @@ pub async fn update_poll_details(
     .execute(pool)
     .await?;
 
+    let ip_id = Uuid::new_v4();
+    sqlx::query!(
+        r#"
+        INSERT INTO ip(ip_id, id, address)
+        VALUES ($1, $2, $3)
+        "#,
+        ip_id, // new Uuid
+        id,
+        connection
+            .realip_remote_addr()
+            .expect("couldn't get client ip")
+    )
+    .execute(pool)
+    .await
+    .map_err(|e| {
+        // log error then return
+        tracing::error!("Failed to execute query: {:?}", e);
+        e
+    })?;
     Ok(())
 }
 

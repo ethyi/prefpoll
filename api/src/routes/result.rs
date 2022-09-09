@@ -36,7 +36,7 @@ pub async fn get_result_info(id: Uuid, pool: &PgPool) -> Result<ResultInfo, sqlx
     let result_info = ResultInfo {
         question: result_info.question,
         options: result_info.options,
-        created_at: result_info.created_at.to_string(),
+        created_at: result_info.created_at.to_rfc3339(),
         num_votes: result_info.total_votes as usize,
         rankings: result_info.ranking,
     };

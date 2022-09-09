@@ -6,6 +6,7 @@ use uuid::Uuid;
 pub struct FormData {
     question: String,
     options: String,
+    duplication: String,
 }
 
 // macro that creates a span for logging the function invocation.
@@ -15,7 +16,8 @@ pub struct FormData {
     skip(form, pool), // ignore these fields
     fields( // attach values to context
         poll_question = %form.question,
-        poll_options = %form.options
+        poll_options = %form.options,
+        poll_duplication = %form.duplication
     )
 )]
 // PgPool is a pool of PgConnections. When it receives a query, it takes
@@ -49,8 +51,8 @@ pub async fn insert_poll(pool: &PgPool, form: &FormData) -> Result<Uuid, sqlx::E
     let id = Uuid::new_v4();
     sqlx::query!(
         r#"
-        INSERT INTO polls (id, question, options, number_options, results, ranking, total_votes, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO polls (id, question, options, number_options, results, ranking, total_votes, created_at, duplication)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         "#,
         id, // new Uuid
         form.question,  // pass in form data
@@ -59,7 +61,8 @@ pub async fn insert_poll(pool: &PgPool, form: &FormData) -> Result<Uuid, sqlx::E
         results, // de to hashmap<order, frequency> order as serialized vec
         ranking, // "[[3,2,1]]" de to Vec<Vec<usize>>
         total_votes,
-        Utc::now() // pass in current time
+        Utc::now(), // pass in current time
+        form.duplication
     )
     .execute(pool)
     .await

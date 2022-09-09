@@ -12,6 +12,7 @@ path = "src/lib.rs" # path to library
 # production dependencies
 [dependencies]
 actix-web = "4" # main backend framework
+actix-cors = "0.6.2"
 # async runtime
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] } 
 # serialization
