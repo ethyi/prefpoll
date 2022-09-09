@@ -86,7 +86,6 @@
   flex-grow: 1;
   display: flex;
   padding: 15px;
-  padding-left: calc(100px-var(12%));
   font-size: 1.2rem;
   line-height: 20px;
   letter-spacing: 0.6px;
@@ -110,7 +109,6 @@
   border: none;
 } */
 .pollStats {
-  padding-top: 10px;
+  margin: 2rem 0 0 0;
   padding-left: 100px;
-  font-size: 1.2 rem;
 }

@@ -85,7 +85,6 @@
   flex-grow: 1;
   display: flex;
   padding: 15px;
-  padding-left: calc(100px-var(12%));
   font-size: 1.2rem;
   line-height: 20px;
   letter-spacing: 0.6px;
@@ -102,7 +101,6 @@
 .pollStats {
   padding-top: 10px;
   padding-left: 100px;
-  font-size: 1.2 rem;
 }
 .errorMessage {
   color: rgb(207, 0, 0);

@@ -35,8 +35,8 @@ function VoteForm({ poll }: { poll: Poll }) {
     axios
       .post("http://localhost:8000/add_vote/" + poll.id, formString)
       .then((response) => {
-        console.log(`statusCode: ${response.status}`);
-        setCookie(poll.id, true);
+        // console.log(`statusCode: ${response.status}`);
+        setCookie(poll.id, true, { sameSite: "lax" });
         router.push("/results/" + poll.id);
       })
       .catch((error) => {
@@ -127,9 +127,10 @@ export default function Vote() {
     if (typeof id !== "string") return;
     axios
       .get(`http://localhost:8000/vote/${id}`)
+
       .then((res) => {
         let data = res.data;
-        console.log(data);
+        // console.log(data);
         let date = new Date(data.created_at).toLocaleDateString();
         let result: Poll = {
           id: id,
@@ -141,7 +142,7 @@ export default function Vote() {
           (data.duplication === "ip" && data.ip_detected) ||
           (data.duplication === "cookie" && hasCookie(id))
         ) {
-          console.log("You have already voted!", data.ip);
+          // console.log("You have already voted!", data.ip);
           router.push("/results/" + id + "?err=true");
         } else {
           setPoll(result);

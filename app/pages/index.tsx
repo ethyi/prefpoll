@@ -12,9 +12,10 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-
+const MAXIMUM_OPTIONS = 20;
 function PollForm() {
   const [poll, setPoll] = React.useState(["", "", "", ""]);
+  const [error, setError] = React.useState(false);
   let duplication = React.useRef("none");
   const router = useRouter();
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -27,7 +28,7 @@ function PollForm() {
 
   function handleSubmit(e: React.ChangeEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log(poll);
+    // console.log(poll);
     // clean data
 
     const question = poll[0];
@@ -40,16 +41,20 @@ function PollForm() {
       return self.indexOf(value) === index;
     });
 
+    if (!question || options.length > MAXIMUM_OPTIONS || options.length < 2) {
+      setError(true);
+      return;
+    }
     let formString = `question=${question}&options=${JSON.stringify(
       options
     )}&duplication=${duplication.current}`;
-    console.log(formString);
+    // console.log(formString);
     axios
       .post("http://localhost:8000/create_poll", formString)
       .then((response) => {
-        console.log(`statusCode: ${response.status}`);
+        // console.log(`statusCode: ${response.status}`);
         let id = response.data;
-        console.log(id);
+        // console.log(id);
         router.push("/vote/" + id);
       })
       .catch((error) => {
@@ -93,7 +98,12 @@ function PollForm() {
           <OptionInput key={index + 1} id={(index + 1).toString()} />
         ))}
       </div>
-
+      {error && (
+        <p className={styles.errorMessage}>
+          Question must be filled. There may be 2 to {MAXIMUM_OPTIONS} unique,
+          non-empty options.
+        </p>
+      )}
       <div className={styles.pollCreate}>
         <FormControl>
           <label className={styles.radioLabel}>Duplication check</label>

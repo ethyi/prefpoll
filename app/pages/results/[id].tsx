@@ -99,9 +99,9 @@ export default function Result() {
       .get(`http://localhost:8000/vote/${id}/r`)
       .then((res) => {
         let data = res.data;
-        console.log(data);
+        // console.log(data);
         let date = new Date(data.created_at).toLocaleDateString();
-        console.log(err);
+        // console.log(err);
         let result: Poll = {
           id: id,
           question: data.question,
