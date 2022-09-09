@@ -1,7 +1,0 @@
-{
-  "/_app": "pages/_app.js",
-  "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/vote/[id]": "pages/vote/[id].js",
-  "/results/[id]": "pages/results/[id].js"
-}
