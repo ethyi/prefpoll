@@ -1,7 +1,7 @@
 # Pref Poll
 A preference based voting webapp.
 
-[Writeup on  my inspiration](https://ethyi.de/posts/prefpoll)
+[Writeup on  my inspiration](https://ethyi.com/posts/prefpoll)
 
 [Deployed App](https://prefpoll.vercel.app/)
 
