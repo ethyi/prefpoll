@@ -15,7 +15,15 @@ async fn main() -> std::io::Result<()> {
     // establish postgres connection
     let connection = PgPoolOptions::new()
         .connect_timeout(std::time::Duration::from_secs(2))
-        .connect_lazy_with(configuration.database.with_db());
+        .connect_with(configuration.database.with_db())
+        .await
+        .expect("Failed to connect to Postgres.");
+
+    // run database migrations on startup
+    sqlx::migrate!("./migrations")
+        .run(&connection)
+        .await
+        .expect("Failed to run database migrations.");
 
     let address = format!(
         "{}:{}",
