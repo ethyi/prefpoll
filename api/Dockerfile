@@ -43,6 +43,7 @@ RUN apt-get update -y \
 
 COPY --from=builder /app/target/release/prefpoll prefpoll
 COPY configuration configuration
+COPY migrations migrations
 # set production configuration
 ENV APP_ENVIRONMENT production
 # launch binary on docker run
